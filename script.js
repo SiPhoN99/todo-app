@@ -9,6 +9,12 @@ addBtn.addEventListener("click", function() {
     const li = document.createElement("li"); // create a list elemint
     li.textContent = taskText;
 
+
+    // Toggle Completed on click 
+    li.addEventListener("click",function(){
+      li.classList.toggle("completed");
+    })
+
     // Create Delete Button
     const delBtn = document.createElement("button");
     delBtn.textContent = "Delete";
@@ -21,7 +27,8 @@ addBtn.addEventListener("click", function() {
 
     // when clicked removes the task
 
-    delBtn.addEventListener("click", function(){
+    delBtn.addEventListener("click", function(event){
+      event.stopPropagation();
       li.remove();
     })
 
