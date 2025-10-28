@@ -1,21 +1,46 @@
-const input = document.getElementById("taskInput"); //get the input 
-const addBtn = document.getElementById("addTaskBtn");// get the button element to use letter for event listener
-const taskList = document.getElementById("taskList"); // list of tasks we are going to create
+const input = document.getElementById("taskInput"); 
+const addBtn = document.getElementById("addTaskBtn");
+const taskList = document.getElementById("taskList");
 
+let tasks = [];
+
+// Load tasks when page opens
+window.onload = function() {
+  const saved = localStorage.getItem("tasks");
+  if (saved) {
+    tasks = JSON.parse(saved);
+    renderTasks();
+  }
+};
+
+// Add new task
 addBtn.addEventListener("click", function() {
-  const taskText = input.value.trim(); // we use .value to get content and we use .trim so we cut any space after or before the txt
-
+  const taskText = input.value.trim();
   if (taskText === "") return;
-    const li = document.createElement("li"); // create a list elemint
-    li.textContent = taskText;
 
+  tasks.push({ text: taskText, completed: false });
+  saveTasks();
+  renderTasks();
+  input.value = "";
+});
 
-    // Toggle Completed on click 
-    li.addEventListener("click",function(){
+// Render all tasks
+function renderTasks() {
+  taskList.innerHTML = "";
+  tasks.forEach((task, index) => {
+    const li = document.createElement("li");
+    li.textContent = task.text;
+
+    if (task.completed) li.classList.add("completed");
+
+    // Toggle completed
+    li.addEventListener("click", function() {
       li.classList.toggle("completed");
-    })
+      tasks[index].completed = li.classList.contains("completed");
+      saveTasks();
+    });
 
-    // Create Delete Button
+    // Delete button
     const delBtn = document.createElement("button");
     delBtn.textContent = "Delete";
     delBtn.style.marginLeft = "10px";
@@ -25,18 +50,19 @@ addBtn.addEventListener("click", function() {
     delBtn.style.borderRadius = "4px";
     delBtn.style.cursor = "pointer";
 
-    // when clicked removes the task
-
-    delBtn.addEventListener("click", function(event){
+    delBtn.addEventListener("click", function(event) {
       event.stopPropagation();
-      li.remove();
-    })
-
-
-
+      tasks.splice(index, 1);
+      saveTasks();
+      renderTasks();
+    });
 
     li.appendChild(delBtn);
     taskList.appendChild(li);
-    input.value = ""; // clear input
-  
-});
+  });
+}
+
+// Save tasks to localStorage
+function saveTasks() {
+  localStorage.setItem("tasks", JSON.stringify(tasks));
+}
